@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>SWTOR Number Cruncher</title>
+  <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+  <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+ <style>
+  .button {
+      background-color: #4CAF50; /* Green */
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+    }
+
+    .input {
+        border: 1px black;
+    }
+</style>
+</head>
+
+<body>
+  <p>SWTOR Augment Number Cruncher</p><br/>
+  <div id="msg">Loading page, please wait ...</div><br/>
+
+  <label for="n1">Number One:</label>
+  <input type="text" id="n1" name="n1" class="input"><br><br>
+
+  <label for="n2">Number Two:</label>
+  <input type="text" id="n2" name="n2" class="input"><br><br>
+
+  <label for="n3">Number Three:</label>
+  <input type="text" id="n3" name="n3" class="input"><br><br>
+
+  <div id="output">Output will appear here</div><br/>
+
+  <button class="button" type="button" id="button">Click Me</button>
+
+  <py-script>
+import math
+from js import document
+from pyodide import create_proxy
+
+def button_click(event):
+      number_one = int(Element("n1").element.value)
+      number_two = int(Element("n2").element.value)
+      number_three = int(Element("n3").element.value)
+      numbers = []
+
+
+      for x in range(int(number_three / number_one)):
+          multiplied = number_one * x
+          subtracted = number_three - multiplied
+          divided = subtracted / number_two
+
+          total = x * number_one + math.ceil(divided) * number_two
+          y = math.ceil(divided)
+          print(f"Number One: {x}\tNumber Two: {math.ceil(y)}\tTotal: {total}")
+          numbers.append(((x, y), total))
+
+
+      for x in range(int(number_three / number_two)):
+          multiplied = number_two * x
+          subtracted = number_three - multiplied
+          divided = subtracted / number_one
+
+          total = math.ceil(divided) * number_one + x * number_two
+          y = math.ceil(divided)
+          print(f"Number One: {y}\tNumber Two: {x}\tTotal: {total}")
+          numbers.append(((y, x), total))
+
+
+      min = numbers[0][1]
+      x = numbers[0][0][0]
+      y = numbers[0][0][1]
+      numbers.pop(0)
+
+      for i in numbers:
+          if i[1] < min:
+              min = i[1]
+              x = i[0][0]
+              y = i[0][1]
+
+      document.getElementById("output").innerHTML = f"The best combination is: Number One: {x} - Number Two: {y} - Total: {min}"
+
+def setup():
+	# The page is ready, clear the "page loading"
+	document.getElementById("msg").innerHTML = ''
+
+	# Create a JsProxy for the callback function
+	click_proxy = create_proxy(button_click)
+
+	# Set the listener to the callback
+	e = document.getElementById("button")
+	e.addEventListener("click", click_proxy)
+
+setup()
+
+  </py-script>
+</body>
+</html>
